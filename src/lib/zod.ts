@@ -12,6 +12,11 @@ export const signupSchema = z
     path: ['passwordConfirm'],
   });
 
+export const loginSchema = z.object({
+  email: z.string().email().trim().min(1).max(255),
+  password: z.string().min(8).max(64),
+});
+
 export const verifyEmailSchema = z.object({
   code: z.string().length(6),
 });

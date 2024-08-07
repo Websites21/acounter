@@ -12,7 +12,7 @@ import {
   updateUserEmailVerifiedByID,
   upsertUser,
 } from '@/lib/server-utils';
-import { signupSchema, verifyEmailSchema } from '@/lib/zod';
+import { loginSchema, signupSchema, verifyEmailSchema } from '@/lib/zod';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -111,4 +111,43 @@ export async function logoutAction() {
 
   cookies().delete('auth_token');
   redirect('/login');
+}
+
+export async function loginAction(data: unknown) {
+  const validation = loginSchema.safeParse(data);
+
+  if (!validation.success) {
+    const errors = validation.error.flatten().fieldErrors;
+    return { success: false, errors, message: '' };
+  }
+
+  const { email, password } = validation.data;
+
+  try {
+    const user = await getUserByEmail(email);
+
+    if (!user || !user.emailVerified) {
+      const message = 'Nieprawidłowy email lub hasło';
+      return { success: false, errors: {}, message };
+    }
+
+    if (!user.passwordHash) {
+      const message = 'Spróbuj zalogować się za pomocą konta Google';
+      return { success: false, errors: {}, message };
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+
+    if (!passwordMatch) {
+      const message = 'Nieprawidłowy email lub hasło';
+      return { success: false, errors: {}, message };
+    }
+
+    const newSession = await createSession(user.id);
+  } catch (error) {
+    const message = 'Coś poszło nie tak. Spróbuj ponownie';
+    return { success: false, errors: {}, message };
+  }
+
+  redirect('/');
 }

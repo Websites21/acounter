@@ -5,6 +5,11 @@ export type TSignupForm = {
   passwordConfirm: string;
 };
 
+export type TLoginForm = {
+  email: string;
+  password: string;
+};
+
 export type TVerifyEmailForm = {
   code: string;
 };

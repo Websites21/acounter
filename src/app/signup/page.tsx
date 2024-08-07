@@ -1,6 +1,12 @@
 import SignupForm from '@/components/signup-form';
+import { verifySession } from '@/lib/server-utils';
+import { redirect } from 'next/navigation';
 
-export default function Signup() {
+export default async function Signup() {
+  const session = await verifySession();
+
+  if (session) redirect('/');
+
   return (
     <section className='px-4 sm:px-8'>
       <h1 className='text-gray-200 text-4xl font-semibold text-center mb-4'>
