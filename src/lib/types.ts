@@ -4,3 +4,7 @@ export type TSignupForm = {
   password: string;
   passwordConfirm: string;
 };
+
+export type TVerifyEmailForm = {
+  code: string;
+};

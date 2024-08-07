@@ -11,3 +11,7 @@ export const signupSchema = z
     message: 'Passwords do not match',
     path: ['passwordConfirm'],
   });
+
+export const verifyEmailSchema = z.object({
+  code: z.string().length(6),
+});
