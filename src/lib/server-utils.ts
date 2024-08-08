@@ -13,7 +13,7 @@ export async function getUserByEmail(email: string) {
 export async function upsertUser(
   name: string,
   email: string,
-  passwordHash: string,
+  passwordHash?: string,
   image?: string
 ) {
   return await prisma.user.upsert({

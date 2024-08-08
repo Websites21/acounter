@@ -1,5 +1,7 @@
 'use server';
 
+import { TEN_MINUTES_IN_S } from '@/lib/contstants';
+import { google } from '@/lib/oauth';
 import { sendVerificationEmail, sendWelcomeEmail } from '@/lib/resend';
 import {
   createSession,
@@ -13,6 +15,7 @@ import {
   upsertUser,
 } from '@/lib/server-utils';
 import { loginSchema, signupSchema, verifyEmailSchema } from '@/lib/zod';
+import { generateCodeVerifier, generateState } from 'arctic';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -150,4 +153,35 @@ export async function loginAction(data: unknown) {
   }
 
   redirect('/');
+}
+
+export async function createGoogleAuthURL() {
+  const state = generateState();
+  const codeVerifier = generateCodeVerifier();
+
+  cookies().set('state', state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: TEN_MINUTES_IN_S,
+    sameSite: 'lax',
+  });
+
+  cookies().set('code_verifier', codeVerifier, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: TEN_MINUTES_IN_S,
+    sameSite: 'lax',
+  });
+
+  let url;
+
+  try {
+    url = await google.createAuthorizationURL(state, codeVerifier, {
+      scopes: ['profile', 'email'],
+    });
+  } catch (error) {
+    return null;
+  }
+
+  redirect(url.toString());
 }

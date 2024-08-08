@@ -1,6 +1,6 @@
 'use client';
 
-import { signupAction } from '@/actions/auth-actions';
+import { createGoogleAuthURL, signupAction } from '@/actions/auth-actions';
 import { TSignupForm } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { signupSchema } from '@/lib/zod';
@@ -53,9 +53,17 @@ export default function SignupForm() {
     }
   }
 
+  async function handleGoogleClick() {
+    await createGoogleAuthURL();
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='max-w-md mx-auto'>
-      <button className='flex items-center justify-center gap-3 w-full border border-gray-700 mb-4 text-gray-200 rounded-lg font-semibold px-12 py-3 text-lg hover:bg-gray-900 transition-all duration-300'>
+      <button
+        className='flex items-center justify-center gap-3 w-full border border-gray-700 mb-4 text-gray-200 rounded-lg font-semibold px-12 py-3 text-lg hover:bg-gray-900 transition-all duration-300'
+        type='button'
+        onClick={handleGoogleClick}
+      >
         <svg
           className='size-6'
           viewBox='0 0 25 24'
